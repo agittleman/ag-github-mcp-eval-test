@@ -7,6 +7,7 @@ from deployment_guard.policy import (
     evaluate_deployment,
 )
 from deployment_guard.rollback import build_rollback_plan
+from deployment_guard.status import DeploymentStatus
 
 
 def test_healthy_deployment_is_allowed() -> None:
@@ -48,3 +49,11 @@ def test_regression_score_combines_errors_and_latency() -> None:
     baseline = ReleaseHealth("v1.0.0", error_rate=0.01, p95_latency_ms=200)
     current = ReleaseHealth("v1.1.0", error_rate=0.02, p95_latency_ms=250)
     assert regression_score(current, baseline) == 150
+
+
+def test_status_response_includes_rollback_readiness() -> None:
+    baseline = ReleaseHealth("v1.0.0", error_rate=0.01, p95_latency_ms=200)
+    current = ReleaseHealth("v1.1.0", error_rate=0.02, p95_latency_ms=250)
+    response = DeploymentStatus("production", current, baseline, True).as_response()
+    assert response["rollback_ready"] is True
+    assert response["regression_score"] == 150
