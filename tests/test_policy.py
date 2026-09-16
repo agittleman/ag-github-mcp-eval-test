@@ -8,6 +8,7 @@ from deployment_guard.policy import (
     DeploymentSignal,
     evaluate_deployment,
 )
+from deployment_guard.readiness import RollbackReadiness
 from deployment_guard.rollback import build_rollback_plan
 from deployment_guard.status import DeploymentStatus
 
@@ -70,3 +71,9 @@ def test_canary_plan_finishes_at_full_traffic() -> None:
     stages = promotion_plan()
     assert stages[0].traffic_percentage == 5
     assert stages[-1].traffic_percentage == 100
+
+
+def test_rollback_readiness_reports_missing_evidence() -> None:
+    readiness = RollbackReadiness(True, False, True)
+    assert not readiness.ready
+    assert readiness.missing_requirements() == ("policy snapshot",)
