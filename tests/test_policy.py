@@ -1,6 +1,7 @@
 import pytest
 
 from deployment_guard.audit import deployment_event
+from deployment_guard.canary import promotion_plan
 from deployment_guard.health import ReleaseHealth, regression_score
 from deployment_guard.policy import (
     DeploymentPolicy,
@@ -63,3 +64,9 @@ def test_status_response_includes_rollback_readiness() -> None:
 def test_audit_event_rejects_unknown_action() -> None:
     with pytest.raises(ValueError):
         deployment_event("deploy-42", "retry", "transient failure")
+
+
+def test_canary_plan_finishes_at_full_traffic() -> None:
+    stages = promotion_plan()
+    assert stages[0].traffic_percentage == 5
+    assert stages[-1].traffic_percentage == 100
