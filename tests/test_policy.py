@@ -5,6 +5,10 @@ from deployment_guard.canary import promotion_plan
 from deployment_guard.diagnostics import FailedCheck, deployment_blocker
 from deployment_guard.health import ReleaseHealth, regression_score
 from deployment_guard.marker import create_marker
+from deployment_guard.performance import (
+    PerformanceBudget,
+    exceeds_performance_budget,
+)
 from deployment_guard.policy import (
     DeploymentPolicy,
     DeploymentSignal,
@@ -72,6 +76,14 @@ def test_canary_plan_finishes_at_full_traffic() -> None:
     stages = promotion_plan()
     assert stages[0].traffic_percentage == 5
     assert stages[-1].traffic_percentage == 100
+
+
+def test_latency_regression_exceeds_performance_budget() -> None:
+    budget = PerformanceBudget(
+        p95_latency_ms=500,
+        maximum_regression_percent=20,
+    )
+    assert exceeds_performance_budget(300, 450, budget)
 
 
 def test_deployment_marker_requires_commit_identity() -> None:
