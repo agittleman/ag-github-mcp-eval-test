@@ -1,0 +1,6 @@
+# Deployment and rollback policy
+/src/deployment_guard/policy.py @agittleman
+/src/deployment_guard/rollback.py @agittleman
+/config/ @agittleman
+/docs/runbooks/ @agittleman
+/.github/workflows/ @agittleman

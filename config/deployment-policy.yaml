@@ -1,0 +1,12 @@
+deployment:
+  require_ci: true
+  max_error_rate: 0.02
+  max_p95_latency_ms: 500
+  rollout:
+    initial_percentage: 5
+    observation_minutes: 15
+    promotion_percentages: [25, 50, 100]
+rollback:
+  automatic_on:
+    - error_budget_exceeded
+    - health_check_failure
