@@ -3,6 +3,7 @@ import pytest
 from deployment_guard.audit import deployment_event
 from deployment_guard.canary import promotion_plan
 from deployment_guard.health import ReleaseHealth, regression_score
+from deployment_guard.marker import create_marker
 from deployment_guard.performance import (
     PerformanceBudget,
     exceeds_performance_budget,
@@ -82,3 +83,8 @@ def test_latency_regression_exceeds_performance_budget() -> None:
         maximum_regression_percent=20,
     )
     assert exceeds_performance_budget(300, 450, budget)
+
+
+def test_deployment_marker_requires_commit_identity() -> None:
+    with pytest.raises(ValueError):
+        create_marker("v0.3.0", "production", "abc")
