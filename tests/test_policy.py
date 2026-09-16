@@ -1,5 +1,6 @@
 import pytest
 
+from deployment_guard.audit import deployment_event
 from deployment_guard.health import ReleaseHealth, regression_score
 from deployment_guard.policy import (
     DeploymentPolicy,
@@ -57,3 +58,8 @@ def test_status_response_includes_rollback_readiness() -> None:
     response = DeploymentStatus("production", current, baseline, True).as_response()
     assert response["rollback_ready"] is True
     assert response["regression_score"] == 150
+
+
+def test_audit_event_rejects_unknown_action() -> None:
+    with pytest.raises(ValueError):
+        deployment_event("deploy-42", "retry", "transient failure")
