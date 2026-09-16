@@ -26,6 +26,14 @@ def test_regressions_block_deployment() -> None:
     assert len(decision.blockers) == 3
 
 
+def test_retry_window_must_be_positive() -> None:
+    with pytest.raises(ValueError):
+        evaluate_deployment(
+            DeploymentSignal(True, 0.0, 100),
+            DeploymentPolicy(retry_window_minutes=0),
+        )
+
+
 def test_rollback_plan_restores_previous_release() -> None:
     plan = build_rollback_plan("v1.1.0", "v1.0.0")
     assert plan.previous_release in plan.steps[1]

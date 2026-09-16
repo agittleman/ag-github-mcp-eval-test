@@ -8,6 +8,7 @@ class DeploymentPolicy:
     max_error_rate: float = 0.02
     max_p95_latency_ms: int = 500
     require_ci: bool = True
+    retry_window_minutes: int = 15
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,8 @@ def evaluate_deployment(
     signal: DeploymentSignal,
     policy: DeploymentPolicy = DeploymentPolicy(),
 ) -> DeploymentDecision:
+    if policy.retry_window_minutes < 1:
+        raise ValueError("retry window must be at least one minute")
     blockers: list[str] = []
     if policy.require_ci and not signal.ci_passed:
         blockers.append("continuous integration is failing")
