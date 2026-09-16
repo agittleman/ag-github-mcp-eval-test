@@ -3,6 +3,7 @@ import pytest
 from deployment_guard.audit import deployment_event
 from deployment_guard.canary import promotion_plan
 from deployment_guard.health import ReleaseHealth, regression_score
+from deployment_guard.marker import create_marker
 from deployment_guard.policy import (
     DeploymentPolicy,
     DeploymentSignal,
@@ -70,3 +71,8 @@ def test_canary_plan_finishes_at_full_traffic() -> None:
     stages = promotion_plan()
     assert stages[0].traffic_percentage == 5
     assert stages[-1].traffic_percentage == 100
+
+
+def test_deployment_marker_requires_commit_identity() -> None:
+    with pytest.raises(ValueError):
+        create_marker("v0.3.0", "production", "abc")
